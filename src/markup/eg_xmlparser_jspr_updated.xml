@@ -1,0 +1,258 @@
+<?xml version='1.0' encoding='latin1'?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="rpt_MmsMenuTrees" language="groovy" pageWidth="1200" pageHeight="842" columnWidth="1160" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+  <property name="ireport.zoom" value="1.0"/>
+  <property name="ireport.x" value="0"/>
+  <property name="ireport.y" value="0"/>
+  <style name="Title" fontName="Arial" fontSize="26" isBold="true" pdfFontName="Helvetica-Bold"/>
+  <style name="SubTitle" forecolor="#666666" fontName="Arial" fontSize="18"/>
+  <style name="Column header" forecolor="#666666" fontName="Arial" fontSize="12" isBold="true"/>
+  <style name="Detail" fontName="Arial" fontSize="12"/>
+  <queryString>
+    
+		select * from menu_tree order by mt_category
+	
+  </queryString>
+  <field name="PROVIDER_ID" class="java.lang.String"/>
+  <field name="MT_ASSET_ID" class="java.lang.String"/>
+  <field name="MG_ASSET_ID" class="java.lang.String"/>
+  <field name="MT_CATEGORY" class="java.lang.String"/>
+  <field name="MENU_NAME" class="java.lang.String"/>
+  <field name="DISPLAY_NAME" class="java.lang.String"/>
+  <field name="UPDATE_NUM" class="java.math.BigDecimal"/>
+  <field name="START_DATETIME" class="java.sql.Timestamp"/>
+  <field name="END_DATETIME" class="java.sql.Timestamp"/>
+  <field name="MARKET" class="java.lang.String"/>
+  <field name="MPT_NODE_ID" class="java.math.BigDecimal"/>
+  <field name="MPT_NAME" class="java.lang.String"/>
+  <field name="PUBLISH_STATUS" class="java.lang.String"/>
+  <field name="MENU_MARKET_MAPPING" class="java.lang.String"/>
+  <background>
+    <band splitType="Stretch"/>
+  </background>
+  <title>
+    <band height="70" splitType="Stretch">
+      <staticText>
+        <reportElement style="Title" x="0" y="13" width="263" height="33"/>
+        <textElement verticalAlignment="Middle"/>
+        <text>
+          Menu Tree Report
+        </text>
+      </staticText>
+      <staticText>
+        <reportElement style="SubTitle" x="100" y="46" width="174" height="22"/>
+        <textElement/>
+        <text>
+          All Menus
+        </text>
+      </staticText>
+    </band>
+  </title>
+  <pageHeader>
+    <band splitType="Stretch"/>
+  </pageHeader>
+  <columnHeader>
+    <band height="36" splitType="Stretch">
+      <line>
+        <reportElement positionType="FixRelativeToBottom" x="0" y="35" width="949" height="1"/>
+        <graphicElement>
+          <pen lineWidth="0.5" lineColor="#999999"/>
+        </graphicElement>
+      </line>
+      <staticText>
+        <reportElement style="Column header" x="0" y="19" width="46" height="15"/>
+        <textElement/>
+        <text>
+          ASSET_ID
+        </text>
+        <staticText reportElement="[{http://jasperreports.sourceforge.net/jasperreports}reportElement[attributes={style=Column header, x=0, y=19, width=46, height=15}; value=[]]]"/>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="146" y="19" width="84" height="15"/>
+        <textElement/>
+        <text>
+          MENU_NAME
+        </text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="241" y="19" width="125" height="15"/>
+        <textElement/>
+        <text>
+          DISPLAY_NAME
+        </text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="366" y="21" width="33" height="15"/>
+        <textElement/>
+        <text>
+          UPDATE_NUM
+        </text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="414" y="19" width="92" height="15"/>
+        <textElement/>
+        <text>
+          START_DATE_TIME
+        </text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="513" y="19" width="97" height="15"/>
+        <textElement/>
+        <text>
+          END_DATETIME
+        </text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="622" y="19" width="92" height="15"/>
+        <textElement/>
+        <text>
+          MPT_NODE_ID
+        </text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="729" y="19" width="85" height="15"/>
+        <textElement/>
+        <text>
+          MPT_NAME
+        </text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="826" y="19" width="28" height="15"/>
+        <textElement/>
+        <text>
+          PUBLISH_STATUS
+        </text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="878" y="19" width="71" height="15"/>
+        <textElement/>
+        <text>
+          MENU_MARKET_MAPPING
+        </text>
+      </staticText>
+    </band>
+  </columnHeader>
+  <detail>
+    <band height="16" splitType="Stretch">
+      <line>
+        <reportElement positionType="FixRelativeToBottom" x="0" y="15" width="949" height="1"/>
+        <graphicElement>
+          <pen lineWidth="0.5" lineColor="#999999"/>
+        </graphicElement>
+      </line>
+      <textField>
+        <reportElement style="Detail" x="0" y="0" width="144" height="15"/>
+        <textElement/>
+        <textFieldExpression class="java.lang.String">
+          $F{MT_ASSET_ID}
+        </textFieldExpression>
+      </textField>
+      <textField>
+        <reportElement style="Detail" x="146" y="0" width="74" height="15"/>
+        <textElement/>
+        <textFieldExpression class="java.lang.String">
+          $F{MENU_NAME}
+        </textFieldExpression>
+      </textField>
+      <textField>
+        <reportElement style="Detail" x="252" y="1" width="92" height="15"/>
+        <textElement/>
+        <textFieldExpression class="java.lang.String">
+          $F{DISPLAY_NAME}
+        </textFieldExpression>
+      </textField>
+      <textField>
+        <reportElement style="Detail" x="437" y="0" width="69" height="15"/>
+        <textElement/>
+        <textFieldExpression class="java.sql.Timestamp">
+          $F{START_DATETIME}
+        </textFieldExpression>
+      </textField>
+      <textField>
+        <reportElement style="Detail" x="550" y="0" width="60" height="15"/>
+        <textElement/>
+        <textFieldExpression class="java.sql.Timestamp">
+          $F{END_DATETIME}
+        </textFieldExpression>
+      </textField>
+      <textField>
+        <reportElement style="Detail" x="668" y="1" width="46" height="15"/>
+        <textElement/>
+        <textFieldExpression class="java.math.BigDecimal">
+          $F{MPT_NODE_ID}
+        </textFieldExpression>
+      </textField>
+      <textField>
+        <reportElement style="Detail" x="746" y="1" width="46" height="15"/>
+        <textElement/>
+        <textFieldExpression class="java.lang.String">
+          $F{MPT_NAME}
+        </textFieldExpression>
+      </textField>
+      <textField>
+        <reportElement style="Detail" x="826" y="0" width="46" height="15"/>
+        <textElement/>
+        <textFieldExpression class="java.lang.String">
+          $F{PUBLISH_STATUS}
+        </textFieldExpression>
+      </textField>
+      <textField>
+        <reportElement style="Detail" x="903" y="1" width="46" height="15"/>
+        <textElement/>
+        <textFieldExpression class="java.lang.String">
+          $F{MENU_MARKET_MAPPING}
+        </textFieldExpression>
+      </textField>
+      <textField>
+        <reportElement style="Detail" x="366" y="0" width="33" height="15"/>
+        <textElement/>
+        <textFieldExpression class="java.math.BigDecimal">
+          $F{UPDATE_NUM}
+        </textFieldExpression>
+      </textField>
+    </band>
+  </detail>
+  <columnFooter>
+    <band height="45" splitType="Stretch">
+      <line>
+        <reportElement positionType="FixRelativeToBottom" x="0" y="3" width="949" height="1"/>
+        <graphicElement>
+          <pen lineWidth="0.5" lineColor="#999999"/>
+        </graphicElement>
+      </line>
+    </band>
+  </columnFooter>
+  <pageFooter>
+    <band height="33" splitType="Stretch">
+      <textField>
+        <reportElement style="Column header" x="276" y="0" width="249" height="20"/>
+        <textElement textAlignment="Right">
+          <font size="10" isBold="false"/>
+        </textElement>
+        <textFieldExpression class="java.lang.String">
+          "Page "+$V{PAGE_NUMBER}+" of"
+        </textFieldExpression>
+      </textField>
+      <textField evaluationTime="Report">
+        <reportElement style="Column header" x="525" y="0" width="189" height="20"/>
+        <textElement>
+          <font size="10" isBold="false"/>
+        </textElement>
+        <textFieldExpression class="java.lang.String">
+          " " + $V{PAGE_NUMBER}
+        </textFieldExpression>
+      </textField>
+      <textField pattern="EEEEE dd MMMMM yyyy">
+        <reportElement style="Column header" x="0" y="0" width="197" height="20"/>
+        <textElement>
+          <font size="10" isBold="false"/>
+        </textElement>
+        <textFieldExpression class="java.util.Date">
+          new java.util.Date()
+        </textFieldExpression>
+      </textField>
+    </band>
+  </pageFooter>
+  <summary>
+    <band splitType="Stretch"/>
+  </summary>
+</jasperReport>
