@@ -18,7 +18,6 @@ def data
 
 try {
 
-
     http.request('http://localhost:19200', Method.GET, ContentType.JSON) { req ->
         uri.path = '/_stats'
         headers.'User-Agent' = "Mozilla/5.0 Firefox/3.0.4"
