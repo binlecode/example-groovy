@@ -25,6 +25,9 @@ class WorkUnit<T> {
     }
 }
 
+/**
+ * Using groovy closure for Runnable / Callable simplifies async coding.
+ */
 class DemoScheduledThreadPoolExecutor {
 
     ScheduledExecutorService scheduledExecutorService
@@ -48,17 +51,13 @@ class DemoScheduledThreadPoolExecutor {
         }
     } as Runnable
 
-    /**
-     *
-     * @return
-     */
     ScheduledFuture startWorkflow() {
-
         ScheduledFuture handler = scheduledExecutorService.scheduleAtFixedRate(worker, 500, 500, TimeUnit.MILLISECONDS)
         return handler
     }
 
-    def cancleWorkflow(ScheduledFuture handler) {
+    def cancelWorkflow(ScheduledFuture handler) {
+        // wrap a delayed cancellation as a Runnable and schedule it
         scheduledExecutorService.schedule({
             handler.cancel(true)
         } as Runnable, 100, TimeUnit.MILLISECONDS)
@@ -83,7 +82,7 @@ Thread.sleep(3000)  // let run for another period
 
 
 println "time is up, cancelling workflow"
-demo.cancleWorkflow(h)
+demo.cancelWorkflow(h)
 
 //demo.ses.awaitTermination(100, TimeUnit.MILLISECONDS)
 

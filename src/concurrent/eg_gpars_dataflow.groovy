@@ -1,9 +1,8 @@
-import groovyx.gpars.dataflow.DataflowQueue
-import groovyx.gpars.dataflow.Promise
-
 @Grab(group='org.codehaus.gpars', module='gpars', version='1.2.1')
 
 import static groovyx.gpars.dataflow.Dataflow.task
+import groovyx.gpars.dataflow.DataflowQueue
+import groovyx.gpars.dataflow.Promise
 
 
 def words = ['Groovy', 'fantastic', 'concurrency', 'fun', 'enjoy', 'safe', 'GPars', 'data', 'flow']

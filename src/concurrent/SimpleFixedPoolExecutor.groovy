@@ -30,6 +30,24 @@ import java.util.concurrent.TimeUnit
  */
 class SimpleFixedPoolExecutor {
 
+    /**
+     * This executor is constructed with custom pool size, queue size and rejection policy.
+     * It does NOT have custom ThreadFactory thus no in-thread exception handling, in other words, the exception
+     * within the thread may NOT be passed out to the caller thread.
+     * <p>
+     * This executor uses blocking queue to bound the number of submitted queue-able tasks.
+     * There is a trade off between queue size and pool size. Use large queue size and moderate pool size
+     * to save resources, but resulting in low throughput.
+     * <p>
+     * This executor supports custom CallerRunsPolicy to force caller thread to run the job too to 'block' incoming
+     * requests or use AbortPolicy to throw RejectedExecutionException to prevent queuing up at controller side.
+     * <p>
+     * @param options includes pool properties such as
+     * - threadPoolShutDownAwaitingTime
+     * - threadPoolMaxThreads
+     * - threadPoolQueueSize
+     * - threadPoolRejectionPolicy: 'abort' or 'callerRuns', default to 'abort'
+     */
     SimpleFixedPoolExecutor(Map<String, Object> options) {
 
         if (options.threadPoolShutDownAwaitingTime instanceof Integer) {
@@ -56,30 +74,21 @@ class SimpleFixedPoolExecutor {
             this.threadPoolRejectionPolicy = 'abort'
         }
 
-        // this executor is constructed with custom pool size, queue size and rejection policy
-        // it does NOT have custom ThreadFactory thus no in-thread exception handling, in other words, the exception
-        // within the thread may NOT be passed out to the caller thread.
         this.executor = new ThreadPoolExecutor(
                 this.threadPoolMaxThreads, // core thread pool size
                 this.threadPoolMaxThreads, // maximum thread pool size
                 1, // time to wait before resizing pool
                 TimeUnit.MINUTES,
-
-                // use blocking queue to bound the number of submitted queue-able tasks
-                // queue size and pool size trade off for each other. Use large queue size and moderate pool size
-                // to save resources, but result in low throughput
                 new ArrayBlockingQueue<Runnable>(this.threadPoolQueueSize, true),
 
-                // use CallerRunsPolicy to force caller thread to run the job too to 'block' incoming requests
-                // use AbortPolicy to throw RejectedExecutionException to prevent queuing up at controller side
                 (this.threadPoolRejectionPolicy == 'abort' ? new ThreadPoolExecutor.AbortPolicy() : new ThreadPoolExecutor.CallerRunsPolicy())
         )
     }
 
     /**
-     *
+     * pool shut down awaiting time period, in seconds, default to 2
      */
-    protected final Integer threadPoolShutDownAwaitingTime  // default to 2
+    protected final Integer threadPoolShutDownAwaitingTime
 
     /**
      * threadPoolQueueSize value of a reasonable integer, default to threadPoolMaxThreads
@@ -156,6 +165,5 @@ class SimpleFixedPoolExecutor {
             executor.shutdownNow()
         }
     }
-
 
 }
