@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit
 
 
 def act = Actors.actor({
+    // loop ensures that the actor does not stop after having processed the first message
     loop {
         // an actor’s message handler (react) can only expect 0 or 1 argument
         react { msg ->  // make sure the type expected, otherwise you’ll get a cast exception
@@ -35,15 +36,12 @@ println 'waiting for promise ...'
 pms.whenBound { println "when bound: $it" }
 println pms.get()  // data already drained by callback closure above, thus nothing returns from .get()
 
-
-// send message to an terminated actor
+// send message to a terminated actor
 def oneTimeReceiver = Actors.actor {
-    loop {
-        react { msg ->
-            println "received $msg"
-            println "and that's it"
-            terminate()
-        }
+    react { msg ->
+        println "received $msg"
+        println "and that's it"
+        terminate()
     }
 }
 oneTimeReceiver.send('hello once')
@@ -51,7 +49,8 @@ TimeUnit.MILLISECONDS.sleep(500)  // after this delay the actor is already termi
 try {
     oneTimeReceiver.send('hello twice')  // nothing happens
 } catch (ex) {
-    assert ex instanceof java.lang.IllegalStateException
+    println "caught exception: ${ex.message}"
+    assert ex instanceof IllegalStateException
     assert ex.message == 'The actor cannot accept messages at this point.'
 }
 
@@ -66,7 +65,7 @@ def member = Actors.actor {
     loop {
         react { greeting ->
             println "${greeting.message} in this ${greeting.event}"
-//            sender.send "nice to meet you too"
+//            sender.send "nice to meet you too"  // alternative way to send replies
             reply 'pleasure'
         }
     }
