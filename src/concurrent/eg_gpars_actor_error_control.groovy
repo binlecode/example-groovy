@@ -4,6 +4,8 @@ import groovyx.gpars.actor.Actors
 import groovyx.gpars.actor.DefaultActor
 import groovyx.gpars.actor.DynamicDispatchActor
 
+import java.util.concurrent.TimeUnit
+
 /**
  * Instead of using try-catch to wrap logic block, an {@code onException()} method can be defined
  * to catch exceptions in aspect oriented way: code is cleaner.
@@ -77,14 +79,26 @@ class SupervisedException extends RuntimeException {
 
 def ssa = new SimpleSupervisedActor().start()
 
+/**
+ * Similar to other JVM’s (such as Scala) implementations, to restart an actor is creating a new instance of
+ * the same type of the stopped actor.
+ * <p>
+ * Therefore, it is important to keep the supervised actor stateless. If the supervised actor contains state
+ * then it is important to make such state serializable and able to transfer to supervisor for the newly
+ * created actor to resume state.
+ */
 def spv = new Supervisor() {
     void onMessage(String message) {
         supervised << message
     }
 
+    /**
+     * this message callback receives exception message from supervised actor
+     */
     void onMessage(SupervisedException se) {
         println "SUPERVISED ACTOR DIES WITH MESSAGE: ${se.message}"
         supervised = supervisedClass.newInstance().start()
+        // no need to reassign supervisedClass as there's no actor type change
     }
 }.start()
 
@@ -93,6 +107,7 @@ spv.link(ssa)
 spv << 'sky'
 spv << 'ocean'
 spv << 'disconnected'
+TimeUnit.MILLISECONDS.sleep(500) // give some delay for supervisor to spawn new actor
 spv << 'garden'
 
 [spv, ssa]*.join()
