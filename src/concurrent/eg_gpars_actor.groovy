@@ -6,7 +6,9 @@ import jdk.nashorn.internal.ir.annotations.Immutable
 
 import java.util.concurrent.TimeUnit
 
-
+/**
+ * Actors.actor DSL creates an actor of {@code DefaultActor} type.
+ */
 def act = Actors.actor({
     // loop ensures that the actor does not stop after having processed the first message
     loop {
@@ -15,6 +17,16 @@ def act = Actors.actor({
             println "received $msg"
             TimeUnit.MILLISECONDS.sleep(200) // add some delay to mimic a blocking process
             reply "I've got $msg"
+        }
+    }
+
+    // use delegate to customize actor lifecycle events callback
+    delegate.metaClass {
+        afterStop = {
+            println 'act is stopped'
+        }
+        onInterrupt = { InterruptedException ie ->
+            println 'act is interrupted'
         }
     }
 })
@@ -65,7 +77,7 @@ def member = Actors.actor {
     loop {
         react { greeting ->
             println "${greeting.message} in this ${greeting.event}"
-//            sender.send "nice to meet you too"  // alternative way to send replies
+//            sender.send "nice to meet you too"  // alternative way to send replies back to 'sender'
             reply 'pleasure'
         }
     }

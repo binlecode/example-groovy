@@ -110,4 +110,5 @@ spv << 'disconnected'
 TimeUnit.MILLISECONDS.sleep(500) // give some delay for supervisor to spawn new actor
 spv << 'garden'
 
+// join() will wait for actor(s) to finish
 [spv, ssa]*.join()
