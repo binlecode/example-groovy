@@ -9,6 +9,28 @@ import groovyx.gpars.actor.DefaultActor
  * and two Player actors. To make it fun, we have two players one for prod one for engr.
  * If prod wins: its a bug, if engr wins: its a feature, else: 'escalate to manager'
  */
+
+enum Move {
+    ROCK,
+    PAPER,
+    SCISSORS
+
+    static size = 3
+
+    static Move winner(Move m1, Move m2) {
+        final rivals = [m1, m2]
+        if (rivals.contains(ROCK) && rivals.contains(PAPER)) {
+            return PAPER
+        } else if (rivals.contains(PAPER) && rivals.contains(SCISSORS)) {
+            return SCISSORS
+        } else if (rivals.contains(SCISSORS) && rivals.contains(ROCK)) {
+            return ROCK
+        } else {  // they are the same, return null to flag a draw
+            return null
+        }
+    }
+}
+
 class Player extends DefaultActor {
     String name
     def random = new Random()
@@ -50,6 +72,14 @@ Closure announce = { String playerName ->
     }
 }
 
+//todo: create a console interactive version that:
+//todo: - ask user to pick either prod or dev side, then code pick the other side
+//todo: - ask user for a move, then code will show a move too (random), then announce winner
+//todo: - ask user if continue with another round
+
+/**
+ * This is the coordinator actor that calls two players to show their moves and announce the winner.
+ */
 def coordinator = Actors.actor {
     Player p1 = player1
     Player p2 = player2
@@ -80,27 +110,6 @@ def coordinator = Actors.actor {
                     p2.send 'show your next move'
                 }
             }
-        }
-    }
-}
-
-enum Move {
-    ROCK,
-    PAPER,
-    SCISSOR
-
-    static size = 3
-
-    static Move winner(Move m1, Move m2) {
-        final rivals = [m1, m2]
-        if (rivals.contains(ROCK) && rivals.contains(PAPER)) {
-            return PAPER
-        } else if (rivals.contains(PAPER) && rivals.contains(SCISSOR)) {
-            return SCISSOR
-        } else if (rivals.contains(SCISSOR) && rivals.contains(ROCK)) {
-            return ROCK
-        } else {  // they are the same, return null to flag a draw
-            return null
         }
     }
 }
