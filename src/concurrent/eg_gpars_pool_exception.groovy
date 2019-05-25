@@ -2,6 +2,7 @@
 
 import groovyx.gpars.GParsPool
 
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * If an exception is thrown while processing any of the passed-in closures, the first exception is re-thrown
@@ -11,5 +12,35 @@ import groovyx.gpars.GParsPool
  * Since Fork/Join algorithms are by nature hierarchical, once any part of the algorithm fails, there’s usually
  * little benefit continuing the computation, since some branches of the algorithm will never return a result.
  */
+try {
+    GParsPool.withPool {
+        AtomicInteger count = new AtomicInteger(0)
+        def rnd = new Random()
+        (1..10).collect { rnd.nextInt(10) }.eachParallel {
+            println "number: ${it}"
+            if (it > 5) {
+                // only the first exception is rethrown to the caller (.eachParallel method) thread
+                throw new RuntimeException("error on > 5 number: $it")
+            }
+        }
+    }
+} catch (ex) {
+    println "caught error: ${ex.message}"
+}
 
-//todo: add pool exception handling example
+/*
+a typical running display is like:
+number: 1
+number: 7
+number: 2
+number: 7
+number: 4
+number: 4
+number: 2
+number: 9
+number: 0
+caught error: java.lang.RuntimeException: error on > 5 number: 7
+
+It is clear that only the first exception (number 7) is thrown to caller (try-catch) thread.
+ */
+
