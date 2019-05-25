@@ -11,6 +11,10 @@ import java.util.concurrent.atomic.AtomicInteger
  * The exception handling mechanism of GParsPool builds on the one provided in the Fork/Join framework.
  * Since Fork/Join algorithms are by nature hierarchical, once any part of the algorithm fails, there’s usually
  * little benefit continuing the computation, since some branches of the algorithm will never return a result.
+ * <p>
+ * Note that GParsPool implementation does not give any guarantees about its behavior after a first unhandled
+ * exception occurs, beyond stopping the algorithm and re-throwing the first detected exception to the caller.
+ * It essentially hands over the error control to the caller thread.
  */
 try {
     GParsPool.withPool {
