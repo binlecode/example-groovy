@@ -18,7 +18,6 @@ import java.util.concurrent.atomic.AtomicInteger
  */
 try {
     GParsPool.withPool {
-        AtomicInteger count = new AtomicInteger(0)
         def rnd = new Random()
         (1..10).collect { rnd.nextInt(10) }.eachParallel {
             println "number: ${it}"
