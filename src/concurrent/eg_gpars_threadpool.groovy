@@ -14,12 +14,18 @@ GParsPool.withPool {   //
 }
 
 
+/**
+ * The difference between GParsPool and GParsExecutorsPool is, the former uses fork/join pool, while the
+ * latter doesn't, instead it uses JDK standard executors service to create thread pool.
+ * In general, GParsPool typically performs much better than GParsExecutorsPool does.
+ */
+
 def longRunningMethod(name) {
     println "hello $name, running ..."
     Thread.sleep(1000)
 }
 
-// customize thread pool size
+// customize pool size
 GParsExecutorsPool.withPool(2) {
     def longRunningMethodWrapper = { arg ->
         longRunningMethod(arg)
