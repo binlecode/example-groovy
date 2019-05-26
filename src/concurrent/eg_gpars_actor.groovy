@@ -11,10 +11,13 @@ import java.util.concurrent.TimeUnit
  * Actors.actor DSL creates an actor of {@code DefaultActor} type.
  * <p>
  * Actors share a pool of threads, which are dynamically assigned to actors when the actors need to
- * react to messages sent to them. The threads are returned back to the pool once a message has been
- * processed and the actor is idle waiting for some more messages to arrive. When idle actors are
+ * {@code react} to messages sent to them. The threads are returned back to the pool once a message has been
+ * processed and the actor is idle waiting for some more messages to arrive. When idle, actors are
  * detached to the thread pool so a relatively small thread pool can serve potentially unlimited number
  * of actors. Virtually unlimited scalability in number of actors is the main advantage of event-based actors.
+ * <p>
+ * Under the covers the memory is synchronized each time a thread is assigned to an actor. Therefore, the actor’s
+ * state can be safely modified by code in the body without any other extra (synchronization or locking) effort.
  */
 def act = Actors.actor({
     // loop ensures that the actor does not stop after having processed the first message
@@ -27,7 +30,7 @@ def act = Actors.actor({
         }
     }
 
-    // use delegate to customize actor lifecycle events callback
+    // use delegate to customize actor lifecycle events callback with groovy meta-programming
     delegate.metaClass {
         afterStop = {
             println 'act is stopped'
