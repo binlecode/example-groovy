@@ -1,6 +1,7 @@
 @Grab(group='org.codehaus.gpars', module='gpars', version='1.2.1')
 
 import groovyx.gpars.actor.Actors
+import groovyx.gpars.actor.DefaultActor
 import groovyx.gpars.dataflow.Promise
 import jdk.nashorn.internal.ir.annotations.Immutable
 
@@ -8,6 +9,12 @@ import java.util.concurrent.TimeUnit
 
 /**
  * Actors.actor DSL creates an actor of {@code DefaultActor} type.
+ * <p>
+ * Actors share a pool of threads, which are dynamically assigned to actors when the actors need to
+ * react to messages sent to them. The threads are returned back to the pool once a message has been
+ * processed and the actor is idle waiting for some more messages to arrive. When idle actors are
+ * detached to the thread pool so a relatively small thread pool can serve potentially unlimited number
+ * of actors. Virtually unlimited scalability in number of actors is the main advantage of event-based actors.
  */
 def act = Actors.actor({
     // loop ensures that the actor does not stop after having processed the first message
@@ -53,18 +60,20 @@ def oneTimeReceiver = Actors.actor {
     react { msg ->
         println "received $msg"
         println "and that's it"
-        terminate()
     }
 }
 oneTimeReceiver.send('hello once')
-TimeUnit.MILLISECONDS.sleep(500)  // after this delay the actor is already terminated
+TimeUnit.MILLISECONDS.sleep(500)  // after some delay the actor is already terminated
 try {
-    oneTimeReceiver.send('hello twice')  // nothing happens
+    oneTimeReceiver.send('hello twice')  //
 } catch (ex) {
     println "caught exception: ${ex.message}"
     assert ex instanceof IllegalStateException
     assert ex.message == 'The actor cannot accept messages at this point.'
 }
+
+// Actors provide a join() method to allow caller thread to wait for the actor to terminate
+oneTimeReceiver.join()
 
 // make message object immutable as much as you can (if not always)
 @Immutable
@@ -73,15 +82,39 @@ class Greeting {
     String event
 }
 
-def member = Actors.actor {
-    loop {
-        react { greeting ->
-            println "${greeting.message} in this ${greeting.event}"
+/**
+ * Alternative to GPars dsl, define an Actor class extending `DefaultActor` class, and override the `act()`
+ * method.
+ */
+class Member extends DefaultActor {
+    /**
+     * Note the protected keyword, act() is internal to actor class, but open for inheritance
+     */
+    @Override
+    protected void act() {
+        loop(2) {  // loop accepts a looping number parameter
+            react { greeting ->
+                println "${greeting.message} in this ${greeting.event}"
 //            sender.send "nice to meet you too"  // alternative way to send replies back to 'sender'
-            reply 'pleasure'
+                reply 'pleasure'
+            }
         }
     }
 }
 
-println(member.sendAndWait(new Greeting(message: 'good evening', event: 'conference meeting')))
+// The new instance (from class constructor call) needs to be started so that it attaches itself to
+// the thread pool and can start accepting messages. While in DSL mode, the closure simply defines
+// an inline actor instance and starts it.
+def member = new Member().start()
+
+println(member.sendAndWait(new Greeting(message: 'good morning', event: 'conference meeting')))
+println(member.sendAndWait(new Greeting(message: 'good afternoon', event: 'conference meeting')))
+try {
+    println(member.sendAndWait(new Greeting(message: 'good evening', event: 'conference meeting')))
+} catch (ex) {
+    assert ex instanceof IllegalStateException
+    println "sender got exception: $ex"
+}
+
+member.join()
 
