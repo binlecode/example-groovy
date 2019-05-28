@@ -32,11 +32,18 @@ def act = Actors.actor({
 
     // use delegate to customize actor lifecycle events callback with groovy meta-programming
     delegate.metaClass {
-        afterStop = {
-            println 'act is stopped'
+        afterStart = {
+            println 'act is started'
+        }
+        afterStop = { List undeliveredMessages ->
+            println "act is stopped before ${undeliveredMessages.size()} messages are delivered"
         }
         onInterrupt = { InterruptedException ie ->
             println 'act is interrupted'
+        }
+        onTimeOut = {
+        }
+        onException = { Throwable e ->
         }
     }
 })
@@ -45,11 +52,11 @@ def act = Actors.actor({
 println (act.sendAndWait('hey'))
 
 // sendAndContinue is non-blocking with a callback closure
-act.sendAndContinue('hola!', { println it })
+act.sendAndContinue('hola', { println it })
 println 'waiting for reply ...'
 
 // sendAndPromise returns a promise
-Promise<String> pms = act.sendAndPromise('promise')
+Promise<String> pms = act.sendAndPromise('ni-hao')
 println 'waiting for promise ...'
 
 // .whenBound is non-blocking call that schedules a callback to run when data is available
@@ -57,6 +64,12 @@ println 'waiting for promise ...'
 // therefore, once the data is claimed by the closure, the .get() method won't be able to retrieve data again
 pms.whenBound { println "when bound: $it" }
 println pms.get()  // data already drained by callback closure above, thus nothing returns from .get()
+
+act.stop()          // onStop callback is invoked
+act.terminate()     // onInterrupt callback is invoked
+act.join()          // act thread is returned to thread pool
+
+
 
 // send message to a terminated actor
 def oneTimeReceiver = Actors.actor {
@@ -78,7 +91,10 @@ try {
 // Actors provide a join() method to allow caller thread to wait for the actor to terminate
 oneTimeReceiver.join()
 
-// make message object immutable as much as you can (if not always)
+
+/**
+ * make message object immutable as much as you can (if not always)
+ */
 @Immutable
 class Greeting {
     String message
@@ -88,6 +104,10 @@ class Greeting {
 /**
  * Alternative to GPars dsl, define an Actor class extending `DefaultActor` class, and override the `act()`
  * method.
+ * <p>
+ * In general, an actor class should not have public methods. In other words, an actor should not be called
+ * from external code, but rather 'triggered' by messages sent to it. If this is followed, then each actor
+ * is 'implicitly' thread-safe.
  */
 class Member extends DefaultActor {
     /**
