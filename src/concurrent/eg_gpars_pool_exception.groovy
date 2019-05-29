@@ -2,8 +2,6 @@
 
 import groovyx.gpars.GParsPool
 
-import java.util.concurrent.atomic.AtomicInteger
-
 /**
  * If an exception is thrown while processing any of the passed-in closures, the first exception is re-thrown
  * from the xxxParallel methods and the algorithm stops as soon as possible.
