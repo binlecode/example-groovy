@@ -4,6 +4,7 @@ import groovyx.gpars.GParsPool
 
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.agent.Agent
+import groovyx.gpars.group.NonDaemonPGroup
 
 import java.util.concurrent.TimeUnit
 
@@ -43,7 +44,7 @@ def actors = []
 Random rdn = new Random()
 
 // have multiple threads sending value-assigning message to the agent with random delay
-Actors.actor {
+def act = Actors.actor {
     GParsPool.withPool(10) {
         (1..10).eachParallel { idx ->
             TimeUnit.MILLISECONDS.sleep(rdn.nextInt(100))
@@ -64,6 +65,7 @@ def observer = Actors.actor {
 
 observer.join()
 actors*.join()
+act.join()
 
 // print error message of collected exceptions from agent
 if (messageWall.hasErrors()) {
@@ -72,7 +74,26 @@ if (messageWall.hasErrors()) {
     }
 }
 
+/**
+ * agent by default use a global daemon thread pool, can use custom parallel group
+ */
+def pg = new NonDaemonPGroup()
+Agent comments = pg.agent(["first comment"])
+GParsPool.withPool {
+    (1..10).eachParallel { idx ->
+        comments << { cmts -> cmts << "comment from guy $idx" }
+    }
+}
 
-//todo: agent by default use a global daemon thread pool, can use comtom pool
+println 'showing received comments:'
+comments.val.each {
+    println it
+}
+
+// make sure to shut down the parallel group, esp a non-daemon one, otherwise the program will never exit
+pg.shutdown()
+
+
+
 
 
