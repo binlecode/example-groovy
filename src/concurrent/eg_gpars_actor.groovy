@@ -67,7 +67,7 @@ println pms.get()  // data already drained by callback closure above, thus nothi
 
 act.stop()          // onStop callback is invoked
 act.terminate()     // onInterrupt callback is invoked
-act.join()          // act thread is returned to thread pool
+act.join()          // main thread is waiting for act thread to finish
 
 
 

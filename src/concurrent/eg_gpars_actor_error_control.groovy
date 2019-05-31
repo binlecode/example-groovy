@@ -21,7 +21,10 @@ def act = Actors.actor() {
 }
 
 act.send 'test 123'
-// this forces the main thread to wait until the actor thread is completed
+// The actor's .join() method forces the main thread to wait until the actor thread is completed.
+// By default, the Actors.actor {} DSL creates actor using default thread pool, which is a daemon thread pool.
+// Since daemon threads doesn't 'retain' main thread, the main thread will exit without waiting for
+// daemon threads to finish.
 act.join()
 
 /**
@@ -110,5 +113,4 @@ spv << 'disconnected'
 TimeUnit.MILLISECONDS.sleep(500) // give some delay for supervisor to spawn new actor
 spv << 'garden'
 
-// join() will wait for actor(s) to finish
 [spv, ssa]*.join()
